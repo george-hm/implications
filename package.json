@@ -1,0 +1,31 @@
+{
+  "name": "dragon-bot-z",
+  "version": "0.0.1",
+  "description": "discord dragonball bot",
+  "main": "index.js",
+  "author": "George",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ./src",
+    "start": "cd ./src && node index.js",
+    "deploy": "cd ./src && node registerCommands.js"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "axios": "^0.21.1",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "knex": "^0.95.6",
+    "luxon": "^2.0.2",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.984.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-es": "^4.1.0",
+    "eslint-plugin-import": "^2.22.0",
+    "jest": "^25.5.4"
+  }
+}
