@@ -1,7 +1,31 @@
 const { Client, Intents } = require('discord.js');
 const Interaction = require('./model/discord/Interaction.js');
+const User = require('./model/discord/User.js');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+
+client.on('messageCreate', async message => {
+    const { member } = message;
+    // only care about messages sent in guilds
+    if (!member) {
+        return;
+    }
+
+    const user = new User(message.member.user);
+    // TODO: build triggers properly later
+    const { channelId } = message;
+    if (channelId !== '723977119746490379' && channelId !== '451772950404792342') {
+        return;
+    }
+
+    const check = /(^|\s)(lfg|lf|looking for (someone|group))(\s|$)/i;
+    if (!check.test(message.content)) {
+        return;
+    }
+
+    const replyMessage = `${user.getMention()} to get access to **Looking for Group** channel, go to <#893560390385041408>`;
+    message.reply(replyMessage);
+});
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand() && !interaction.isButton() && !interaction.isSelectMenu()) return;
