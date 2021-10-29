@@ -1,7 +1,6 @@
 {
-  "name": "dragon-bot-z",
+  "name": "implications",
   "version": "0.0.1",
-  "description": "discord dragonball bot",
   "main": "index.js",
   "author": "George",
   "license": "MIT",
