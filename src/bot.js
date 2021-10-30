@@ -18,6 +18,7 @@ client.on('messageCreate', async message => {
         return;
     }
 
+    console.log(message);
     const check = /(^|\s)(lfg|lf|looking for (someone|group))(\s|$)/i;
     if (!check.test(message.content)) {
         return;
