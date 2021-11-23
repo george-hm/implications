@@ -18,8 +18,20 @@ client.on('messageCreate', async message => {
         return;
     }
 
-    const check = /(^|\s)(lfg|lf|looking for (someone|group))(\s|$)/i;
-    if (!check.test(message.content)) {
+    const checks = [
+        /(^|\s)(lfg|lf|looking for (someone|group))(\s|$)/i,
+        /(up|down) for (hell |)gates/i,
+        /(looking for|need) (2v2|1v1|2x2|1x1)/i,
+    ];
+    let checkMatched = false;
+    for (const check of checks) {
+        if (check.test(message.content)) {
+            checkMatched = true;
+            break;
+        }
+    }
+
+    if (!checkMatched) {
         return;
     }
 
