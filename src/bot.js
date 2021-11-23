@@ -7,7 +7,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 client.on('messageCreate', async message => {
     const { member } = message;
     // only care about messages sent in guilds
-    if (!member) {
+    if (!member || member.user.bot) {
         return;
     }
 
