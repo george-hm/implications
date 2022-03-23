@@ -24,6 +24,14 @@ class Embed {
         this._title = title;
     }
 
+    setTitle(title) {
+        this._title = title;
+    }
+
+    setColor(color) {
+        this._color = color;
+    }
+
     static createField(title, message) {
         return {
             name: title,
