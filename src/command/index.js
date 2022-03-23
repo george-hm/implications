@@ -1,8 +1,8 @@
 const Command = require('./Command.js');
-const Example = require('./Example.js');
+const Blackjack = require('./Blackjack.js');
 
 const mapping = {
-    [Example.commandName]: Example,
+    [Blackjack.commandName]: Blackjack,
 };
 
 module.exports.getCommand = (commandName, customId, options, user, values) => {
