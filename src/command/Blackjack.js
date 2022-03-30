@@ -52,7 +52,7 @@ class Blackjack extends Command {
         openGames[this.user.getUserId()].player.push(openGames[this.user.getUserId()].deck.pop());
         openGames[this.user.getUserId()].dealer.push(openGames[this.user.getUserId()].deck.pop());
 
-        const totals = this.getTotals(openGames[this.user.getUserId()]);
+        const totals = this.getTotals();
         if (totals.player === 21 || totals.dealer === 21) {
             return this.end();
         }
@@ -63,7 +63,7 @@ class Blackjack extends Command {
     hit() {
         const game = openGames[this.user.getUserId()];
         game.player.push(game.deck.pop());
-        const totals = this.getTotals(game);
+        const totals = this.getTotals();
         if (totals.player > 21) {
             return this.end();
         }
@@ -73,7 +73,7 @@ class Blackjack extends Command {
 
     stand() {
         const game = openGames[this.user.getUserId()];
-        const totals = this.getTotals(game);
+        const totals = this.getTotals();
         if (totals.player > 21) {
             return this.end();
         }
@@ -88,7 +88,7 @@ class Blackjack extends Command {
 
     end() {
         const game = openGames[this.user.getUserId()];
-        const totals = this.getTotals(game);
+        const totals = this.getTotals();
         const playerTotal = totals.player;
         const dealerTotal = totals.dealer;
 
@@ -143,7 +143,8 @@ class Blackjack extends Command {
      *
      * @param {*} game the blackjack game
      */
-    getTotals(game) {
+    getTotals() {
+        const game = openGames[this.user.getUserId()];
         return {
             player: Card.getTotalValue(game.player),
             dealer: Card.getTotalValue(game.dealer),
