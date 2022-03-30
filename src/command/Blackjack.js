@@ -129,12 +129,10 @@ class Blackjack extends Command {
      * @param {*} game the blackjack game
      */
     getTotals(game) {
-        const totals = {};
-        const playerTotal = game.player.reduce((total, card) => total + card.getValue(), 0);
-        const dealerTotal = game.dealer.reduce((total, card) => total + card.getValue(), 0);
-        totals.player = playerTotal;
-        totals.dealer = dealerTotal;
-        return totals;
+        return {
+            player: Card.getTotalValue(game.player),
+            dealer: Card.getTotalValue(game.dealer),
+        };
     }
 
     getResponse(editMessage) {
