@@ -20,8 +20,8 @@ class Response {
             this._components = [components.toComponentObject()];
         }
 
-        this._ephemeral = ephemeral;
-        this._deleteOriginal = editMessage;
+        this._ephemeral = !!ephemeral;
+        this._deleteOriginal = !!editMessage;
     }
 
     shouldEditMessage() {
@@ -33,7 +33,7 @@ class Response {
             content: this._messageContent,
             embeds: this._embeds,
             components: this._components,
-            ephemeral: !!this._ephemeral,
+            ephemeral: this._ephemeral,
         };
 
         // remove all falsey/optional data
