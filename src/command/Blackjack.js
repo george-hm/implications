@@ -38,12 +38,7 @@ class Blackjack extends Command {
 
     start() {
         if (openGames[this.user.getUserId()]) {
-            return new InteractionResponse(
-                'You already have a blackjack game in progress',
-                null,
-                null,
-                true,
-            );
+            return this.getResponse();
         }
 
         openGames[this.user.getUserId()] = {
@@ -145,22 +140,31 @@ class Blackjack extends Command {
         return totals;
     }
 
-    getResponse() {
+    getResponse(editMessage) {
         const game = openGames[this.user.getUserId()];
-        const playerCards = `**${this.user.getName()}**: ${game.player.map(card => card.getSummary()).join(' ')}`;
-        const dealerStart = game.dealer.length === 2;
-        let dealerCards = `**Dealer**: ${game.dealer.slice(0, game.dealer.length - 1).map(card => card.getSummary()).join(' ')}`;
+        const playerCards = game.player;
+        const playerCardsString = `${playerCards.map(card => card.getSummary()).join(' ')}`;
+        const dealerCards = game.dealer;
+        const dealerStart = dealerCards.length === 2;
+        let dealerCardsString = `${dealerCards.slice(0, dealerCards.length - 1).map(card => card.getSummary()).join(' ')}`;
         if (dealerStart) {
-            dealerCards += Card.emptySummary();
+            // need a space for discord formatting
+            dealerCardsString += ` ${Card.emptySummary()}`;
         } else {
-            dealerCards += ` **${game.dealer[game.dealer.length - 1].getSummary()}**`;
+            dealerCardsString += ` ${game.dealer[game.dealer.length - 1].getSummary()}`;
         }
 
-        const textResponse = `${playerCards}\n${dealerCards}`;
+        const playerTotal = Card.getTotalValue(playerCards);
+        const dealerTotal = Card.getTotalValue(
+            dealerStart ? dealerCards.slice(0, dealerCards.length - 1) : dealerCards,
+        );
+
+        const textResponse = `**${this.user.getName()}**: ${playerTotal}\n${playerCardsString}\n**Dealer**: ${dealerTotal}\n${dealerCardsString}`;
 
         const embedToReturn = new Embed(
             'Blackjack',
             textResponse,
+            '#0000ff',
         );
 
         const buttons = [
