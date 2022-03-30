@@ -68,7 +68,7 @@ class Blackjack extends Command {
             return this.end();
         }
 
-        return this.getResponse();
+        return this.getResponse(true);
     }
 
     stand() {
@@ -117,7 +117,9 @@ class Blackjack extends Command {
         return new InteractionResponse(
             null,
             [embedToReturn],
-            buttons,
+            container,
+            false,
+            true,
         );
     }
 
