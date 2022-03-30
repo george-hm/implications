@@ -108,15 +108,10 @@ class Blackjack extends Command {
             ),
         ];
 
-        if (playerWon) {
-            embedToReturn.setColor('#00ff00');
-            embedToReturn.setTitle('You won!');
-        } else {
-            embedToReturn.setColor('#ff0000');
-            embedToReturn.setTitle('You lost!');
-        }
-
-        // handle updating credits here - call method on user model
+        const container = new Component(
+            Component.TYPE_CONTAINER,
+        );
+        container.setComponents(buttons);
 
         delete openGames[this.user.getUserId()];
         return new InteractionResponse(
@@ -184,10 +179,17 @@ class Blackjack extends Command {
             ),
         ];
 
+        const btnContainer = new Component(
+            Component.TYPE_CONTAINER,
+        );
+        btnContainer.setComponents(buttons);
+
         return new InteractionResponse(
-            null,
+            'Blackjack',
             [embedToReturn],
-            buttons,
+            btnContainer,
+            false,
+            editMessage,
         );
     }
 
