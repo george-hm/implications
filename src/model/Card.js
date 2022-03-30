@@ -48,14 +48,14 @@ class Card {
             shuffledDeck.push(cards[index]);
             cards.splice(index, 1);
         }
-        return cards;
+        return shuffledDeck;
     }
 
     static getTotalValue(cards) {
         const total = cards.reduce((acc, card) => acc + card.value, 0);
         const includesAce = cards.some(card => card.rank === 'A');
         if (includesAce && total > 21) {
-            return total - 10;
+            return total - 9;
         }
         return total;
     }
