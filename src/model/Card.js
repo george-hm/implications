@@ -24,11 +24,15 @@ class Card {
     }
 
     getSummary() {
-        return ` -\n|${this.rank}|\n|${this.getSuiteArt()}|\n-`;
+        return `\`${this.rank}${this.getSuiteArt()}\``;
+    }
+
+    getValue() {
+        return this.value;
     }
 
     static emptySummary() {
-        return ' -\n|?|\n|?|\n-';
+        return '\`??\`';
     }
 
     static getRandomDeck() {
