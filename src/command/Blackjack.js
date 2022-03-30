@@ -91,6 +91,12 @@ class Blackjack extends Command {
         const totals = this.getTotals(game);
         const playerTotal = totals.player;
         const dealerTotal = totals.dealer;
+
+        if ((dealerTotal < 17 || playerTotal > dealerTotal) && playerTotal < 22) {
+            game.dealer.push(game.deck.pop());
+            return this.end();
+        }
+
         const playerWon = playerTotal > 21 ? false : playerTotal > dealerTotal || dealerTotal > 21;
         const textResponse = `**${this.user.getName()}**: ${playerTotal}\n${game.player.map(card => card.getSummary())}\n**Dealer**: ${dealerTotal}\n${game.dealer.map(card => card.getSummary())}`;
         const embedToReturn = new Embed(
