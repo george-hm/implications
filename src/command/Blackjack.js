@@ -92,12 +92,21 @@ class Blackjack extends Command {
         const playerTotal = totals.player;
         const dealerTotal = totals.dealer;
         const playerWon = playerTotal > 21 ? false : playerTotal > dealerTotal || dealerTotal > 21;
-        const textResponse = `**${this.user.getName()}**: ${playerTotal}\n**Dealer**: ${dealerTotal}`;
+        const textResponse = `**${this.user.getName()}**: ${playerTotal}\n${game.player.map(card => card.getSummary())}\n**Dealer**: ${dealerTotal}\n${game.dealer.map(card => card.getSummary())}`;
         const embedToReturn = new Embed(
             'Blackjack',
             textResponse,
         );
 
+        if (playerWon) {
+            embedToReturn.setColor('#00ff00');
+            embedToReturn.setTitle('You won!');
+        } else {
+            embedToReturn.setColor('#ff0000');
+            embedToReturn.setTitle('You lost!');
+        }
+
+        // handle updating credits here - call method on user model
         const buttons = [
             new Component(
                 Component.TYPE_BUTTON,
