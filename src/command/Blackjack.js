@@ -13,6 +13,14 @@ const actionStand = 'stand';
 class Blackjack extends Command {
     async main() {
         const { customIdValue } = this;
+        if (this.user.getUserId() !== '129416238916042752' && this.user.getUserId() !== '84005689822810112') {
+            return new InteractionResponse(
+                'You are not authorized to use this command',
+                null,
+                null,
+                true,
+            );
+        }
         if (!openGames[this.user.getUserId()]) {
             return this.start();
         }
