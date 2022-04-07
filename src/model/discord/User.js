@@ -1,3 +1,7 @@
+const fs = require('fs');
+const allUserData = require('../../users.json');
+const time = require('../../time.js');
+
 // https://discord.com/developers/docs/resources/user#user-object
 class User {
     constructor(user) {
@@ -13,6 +17,107 @@ class User {
         this._flags = user.flags;
         this._premiumType = user.premium_type;
         this._publicFlags = user.public_flags;
+        this._currency = 0;
+        this.lastDailyCheckin = 0;
+        this.lastHourlyCheckin = 0;
+        this.dailyStreak = 0;
+        this.hourlyStreak = 0;
+    }
+
+    static save() {
+        allUserData[this.getUserId()] = this.getUserDataObject();
+        fs.writeFileSync('./users.json', JSON.stringify(allUserData, null, 2));
+    }
+
+    static loadUserInfo(rawUser) {
+        const builtUser = new User(rawUser);
+        const userData = allUserData[builtUser.getUserId()];
+        if (!userData) {
+            User.save();
+        }
+
+        builtUser._currency = userData.currency;
+        builtUser.lastDailyCheckin = userData.lastDailyCheckin;
+        builtUser.lastHourlyCheckin = userData.lastHourlyCheckin;
+        builtUser.dailyStreak = userData.dailyStreak;
+        builtUser.hourlyStreak = userData.hourlyStreak;
+
+        return builtUser;
+    }
+
+    getUserDataObject() {
+        return {
+            currency: this._currency,
+            lastDailyCheckin: this.lastDailyCheckin,
+            lastHourlyCheckin: this.lastHourlyCheckin,
+            dailyStreak: this.dailyStreak,
+            hourlyStreak: this.hourlyStreak,
+        };
+    }
+
+    /**
+     * Increases player streak
+     * Add reward to currency
+     * Returns reward value
+     *
+     * @returns {User}
+     * @memberof User
+     */
+    _grantReward(rewardValue, streakModifier, currentStreak) {
+        // reward + (streak modifier * currentStreak)
+        const reward = rewardValue + Math.ceil(
+            (
+                (rewardValue / 100) * streakModifier
+            ) * currentStreak,
+        );
+
+        this._currency += reward;
+
+        return reward;
+    }
+
+    addCurrency(amount) {
+        this._currency += amount;
+        return this;
+    }
+
+    removeCurrency(amount) {
+        this._currency -= amount;
+        return this;
+    }
+
+    static get HourlyReward() {
+        return 5;
+    }
+
+    static get DailyReward() {
+        return 20;
+    }
+
+    grantHourlyReward() {
+        const streakModifier = 33;
+        this._hourlyStreak = time.hourlyStreakIsValid(this._hourlyStreak, this._lastHourlyCheckin) ?
+            this._hourlyStreak : 0;
+        const rewardValue = this._grantReward(
+            User.HourlyReward,
+            streakModifier,
+            this._hourlyStreak,
+        );
+        this._hourlyStreak++;
+        return rewardValue;
+    }
+
+    grantDailyReward() {
+        const streakModifier = 18;
+        this.dailyStreak = time.dailyStreakIsValid(this.dailyStreak, this.lastDailyCheckin) ?
+            this.dailyStreak : 0;
+        const rewardValue = this._grantReward(
+            User.DailyReward,
+            streakModifier,
+            this.dailyStreak,
+        );
+        this.dailyStreak++;
+        return rewardValue;
     }
 
     getAvatarURL() {
