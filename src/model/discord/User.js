@@ -29,6 +29,10 @@ class User {
         fs.writeFileSync('./users.json', JSON.stringify(allUserData, null, 2));
     }
 
+    save() {
+        return User.save();
+    }
+
     static loadUserInfo(rawUser) {
         const builtUser = new User(rawUser);
         const userData = allUserData[builtUser.getUserId()];
@@ -76,6 +80,10 @@ class User {
         return reward;
     }
 
+    get currency() {
+        return this._currency;
+    }
+
     addCurrency(amount) {
         this._currency += amount;
         return this;
@@ -83,6 +91,9 @@ class User {
 
     removeCurrency(amount) {
         this._currency -= amount;
+        if (this._currency < 0) {
+            this._currency = 0;
+        }
         return this;
     }
 
