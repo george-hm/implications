@@ -7,13 +7,14 @@ const Component = require('../model/discord/Component.js');
 
 const openGames = {};
 
+const optionAmount = 'amount';
 const actionHit = 'hit';
 const actionStand = 'stand';
 
 class Blackjack extends Command {
     async main() {
         const { customIdValue } = this;
-        if (this.user.getUserId() !== '129416238916042752' && this.user.getUserId() !== '84005689822810112') {
+        if (this.user.getUserId() !== '129416238916042752' && this.user.getUserId() !== '84005689822810112' && this.user.getUserId() !== '126415597578878987') {
             return new InteractionResponse(
                 'You are not authorized to use this command',
                 null,
@@ -41,10 +42,33 @@ class Blackjack extends Command {
             return this.getResponse();
         }
 
+        const betAmount = this.getGambleAmount();
+
+        if (!betAmount) {
+            return new InteractionResponse(
+                `Invalid bet of ${betAmount}FBX, try again`,
+                null,
+                null,
+                true,
+            );
+        }
+
+        if (betAmount > this.user.currency) {
+            return new InteractionResponse(
+                `You don't have enough funbux to bet ${betAmount}`,
+                null,
+                null,
+                true,
+            );
+        }
+
+        this.user.removeCurrency(betAmount);
+
         openGames[this.user.getUserId()] = {
             deck: Card.getRandomDeck(),
             player: [],
             dealer: [],
+            amount: betAmount,
         };
 
         openGames[this.user.getUserId()].player.push(openGames[this.user.getUserId()].deck.pop());
@@ -57,6 +81,7 @@ class Blackjack extends Command {
             return this.end();
         }
 
+        this.user.save();
         return this.getResponse();
     }
 
@@ -98,18 +123,28 @@ class Blackjack extends Command {
         }
 
         const playerWon = playerTotal > 21 ? false : playerTotal > dealerTotal || dealerTotal > 21;
+        const draw = playerTotal === dealerTotal;
         const textResponse = `**${this.user.getName()}**: ${playerTotal}\n${game.player.map(card => card.getSummary())}\n**Dealer**: ${dealerTotal}\n${game.dealer.map(card => card.getSummary())}`;
         const embedToReturn = new Embed(
             'Blackjack',
             textResponse,
         );
 
+        let returnText = '';
         if (playerWon) {
             embedToReturn.setColor('#00ff00');
             embedToReturn.setTitle('You won!');
+            this.user.addCurrency(game.amount * 2);
+            returnText = `You won ${game.amount * 2} funbux`;
+        } else if (draw) {
+            embedToReturn.setColor('#ffff00');
+            embedToReturn.setTitle('Draw!');
+            this.user.addCurrency(game.amount);
+            returnText = `Bet of ${game.amount} funbux returned`;
         } else {
             embedToReturn.setColor('#ff0000');
             embedToReturn.setTitle('You lost!');
+            returnText = 'Better luck next time';
         }
 
         // handle updating credits here - call method on user model
@@ -117,9 +152,12 @@ class Blackjack extends Command {
             new Component(
                 Component.TYPE_BUTTON,
                 Component.STYLE_PRIMARY,
-                'Play again',
+                `Play again (${game.amount}FNB)`,
                 null,
-                this.createCustomId(actionHit),
+                this.createCustomId(
+                    actionHit,
+                    game.amount,
+                ),
             ),
         ];
 
@@ -130,12 +168,22 @@ class Blackjack extends Command {
 
         delete openGames[this.user.getUserId()];
         return new InteractionResponse(
-            null,
+            returnText,
             [embedToReturn],
             container,
             false,
             true,
         );
+    }
+
+    createCustomId(name, extraData) {
+        return `${super.createCustomId(name)}.${extraData}`;
+    }
+
+    getGambleAmount() {
+        return this.options.getNumber(optionAmount) ||
+            this._customId?.split('.')[3] ||
+            null;
     }
 
     /**
@@ -217,6 +265,9 @@ class Blackjack extends Command {
         return new SlashCommandBuilder()
             .setName(this.commandName)
             .setDescription('Play blackjack')
+            .addStringOption(option => option.setName(optionAmount)
+                .setDescription('How much you want to gamble')
+                .setRequired(true))
             .toJSON();
     }
 }
