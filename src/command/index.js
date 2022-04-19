@@ -1,8 +1,12 @@
 const Command = require('./Command.js');
 const Blackjack = require('./Blackjack.js');
+const DailyCheckIn = require('./DailyCheckIn.js');
+const HourlyCheckIn = require('./HourlyCheckIn.js');
 
 const mapping = {
     [Blackjack.commandName]: Blackjack,
+    [DailyCheckIn.commandName]: DailyCheckIn,
+    [HourlyCheckIn.commandName]: HourlyCheckIn,
 };
 
 module.exports.getCommand = (commandName, customId, options, user, values) => {
