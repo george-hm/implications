@@ -5,7 +5,7 @@ const day = hour * 24;
 
 class Time {
     static getPrintableTimestamp() {
-        const time = this.time * 1000;
+        const time = this.getTime() * 1000;
         const date = new Date(time);
         const currentDay = this._pad0(date.getDate());
         const currentMonth = this._pad0(date.getMonth() + 1);
@@ -18,8 +18,71 @@ class Time {
         return `[${currentDay}-${currentMonth}-${currentYear} ${hours}:${minutes}:${seconds}]`;
     }
 
-    static get time() {
+    static getTime() {
         return Math.floor(Date.now() / 1000);
+    }
+
+    static eligableForDaily(lastCheckIn) {
+        return this._withinTime(lastCheckIn, day);
+    }
+
+    static eligableForHourly(lastCheckIn) {
+        return this._withinTime(lastCheckIn, hour);
+    }
+
+    static dailyStreakIsValid(streak, lastCheckin) {
+        return this._streakIsValid(streak, day, lastCheckin);
+    }
+
+    static hourlyStreakIsValid(streak, lastCheckin) {
+        return this._streakIsValid(streak, hour, lastCheckin);
+    }
+
+    static _streakIsValid(streak, timeframe, lastCheckin) {
+        if (!streak) {
+            return false;
+        }
+
+        const timeNow = this.getTime();
+        if (timeNow - lastCheckin > (timeframe * 2)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    static timeUntilHourly(lastCheckIn) {
+        return this.timeUntil(lastCheckIn, hour);
+    }
+
+    static timeUntilDaily(lastCheckIn) {
+        return this.timeUntil(lastCheckIn, day);
+    }
+
+    static timeUntil(lastCheckIn, timeChunk) {
+        const timeNow = this.getTime();
+        return this.formatTime((lastCheckIn + (timeChunk || 0)) - timeNow);
+    }
+
+    static _withinTime(timeToCheck, timeChunk) {
+        const time = this.getTime();
+        if (timeToCheck === 0) {
+            return true;
+        }
+
+        if (time - timeToCheck > timeChunk) {
+            return true;
+        }
+
+        return false;
+    }
+
+    static get dailyReward() {
+        return 20;
+    }
+
+    static get hourlyReward() {
+        return 5;
     }
 
     static _pad0(value) {
