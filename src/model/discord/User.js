@@ -98,11 +98,11 @@ class User {
     }
 
     static get HourlyReward() {
-        return 5;
+        return 5000;
     }
 
     static get DailyReward() {
-        return 20;
+        return 25000;
     }
 
     grantHourlyReward() {
