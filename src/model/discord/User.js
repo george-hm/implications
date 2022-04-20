@@ -18,33 +18,30 @@ class User {
         this._premiumType = user.premium_type;
         this._publicFlags = user.public_flags;
         this._currency = 0;
-        this.lastDailyCheckin = 0;
-        this.lastHourlyCheckin = 0;
+        this.lastDailyCheckIn = 0;
+        this.lastHourlyCheckIn = 0;
         this.dailyStreak = 0;
-        this.hourlyStreak = 0;
+        this._hourlyStreak = 0;
     }
 
-    static save() {
+    save() {
         allUserData[this.getUserId()] = this.getUserDataObject();
         fs.writeFileSync('./users.json', JSON.stringify(allUserData, null, 2));
     }
 
-    save() {
-        return User.save();
-    }
-
     static loadUserInfo(rawUser) {
         const builtUser = new User(rawUser);
-        const userData = allUserData[builtUser.getUserId()];
-        if (!userData) {
-            User.save();
+        const userData = allUserData[builtUser.getUserId()] || {};
+        if (!Object.keys(userData).length) {
+            builtUser.save();
+            return builtUser;
         }
 
         builtUser._currency = userData.currency;
-        builtUser.lastDailyCheckin = userData.lastDailyCheckin;
-        builtUser.lastHourlyCheckin = userData.lastHourlyCheckin;
+        builtUser.lastDailyCheckIn = userData.lastDailyCheckIn;
+        builtUser.lastHourlyCheckIn = userData.lastHourlyCheckIn;
         builtUser.dailyStreak = userData.dailyStreak;
-        builtUser.hourlyStreak = userData.hourlyStreak;
+        builtUser._hourlyStreak = userData.hourlyStreak;
 
         return builtUser;
     }
@@ -52,10 +49,10 @@ class User {
     getUserDataObject() {
         return {
             currency: this._currency,
-            lastDailyCheckin: this.lastDailyCheckin,
-            lastHourlyCheckin: this.lastHourlyCheckin,
-            dailyStreak: this.dailyStreak,
-            hourlyStreak: this.hourlyStreak,
+            lastDailyCheckIn: this.lastDailyCheckIn,
+            lastHourlyCheckIn: this.lastHourlyCheckIn,
+            dailyStreak: this._dailyStreak,
+            hourlyStreak: this._hourlyStreak,
         };
     }
 
@@ -120,7 +117,7 @@ class User {
 
     grantDailyReward() {
         const streakModifier = 18;
-        this.dailyStreak = time.dailyStreakIsValid(this.dailyStreak, this.lastDailyCheckin) ?
+        this.dailyStreak = time.dailyStreakIsValid(this.dailyStreak, this.lastDailyCheckIn) ?
             this.dailyStreak : 0;
         const rewardValue = this._grantReward(
             User.DailyReward,
