@@ -5,8 +5,7 @@ const Time = require('../time.js');
 
 class DailyCheckIn extends Command {
     async main() {
-        const user = this.getUser();
-        await user.loadPlayerInfo();
+        const { user } = this;
         const { lastDailyCheckIn } = user;
         if (!Time.eligableForDaily(lastDailyCheckIn)) {
             const timeUntilDaily = Time.timeUntilDaily(lastDailyCheckIn);

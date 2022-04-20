@@ -5,9 +5,9 @@ const Time = require('../time.js');
 
 class HourlyCheckIn extends Command {
     async main() {
-        const user = this.getUser();
-        await user.loadPlayerInfo();
+        const { user } = this;
         const { lastHourlyCheckIn } = user;
+        console.log(user);
         if (!Time.eligableForHourly(lastHourlyCheckIn)) {
             const timeUntilHourly = Time.timeUntilHourly(lastHourlyCheckIn);
             return new InteractionResponse(
@@ -17,7 +17,7 @@ class HourlyCheckIn extends Command {
 
         const rewardValue = user.grantHourlyReward();
         user.lastHourlyCheckIn = Time.getTime();
-        await user.save();
+        user.save();
 
         return new InteractionResponse(
             `${rewardValue} funbux given, eh it's alright I guess\nStreak: **${user.hourlyStreak}**`,
