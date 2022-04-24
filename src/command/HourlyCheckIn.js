@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Command = require('./Command.js');
 const InteractionResponse = require('../model/discord/InteractionResponse.js');
 const Time = require('../time.js');
+const lib = require('../lib.js');
 
 class HourlyCheckIn extends Command {
     async main() {
@@ -20,7 +21,7 @@ class HourlyCheckIn extends Command {
         user.save();
 
         return new InteractionResponse(
-            `${rewardValue} funbux given, eh it's alright I guess\nStreak: **${user.hourlyStreak}**`,
+            `${lib.getFormattedCurrencyFBX(rewardValue, true)} given, eh it's alright I guess\nStreak: **${user.hourlyStreak}**`,
         );
     }
 

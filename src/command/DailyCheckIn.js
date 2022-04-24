@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Command = require('./Command.js');
 const InteractionResponse = require('../model/discord/InteractionResponse.js');
 const Time = require('../time.js');
+const lib = require('../lib.js');
 
 class DailyCheckIn extends Command {
     async main() {
@@ -19,7 +20,7 @@ class DailyCheckIn extends Command {
         await user.save();
 
         return new InteractionResponse(
-            `${rewardValue} funbux, holy\nStreak: **${user.dailyStreak}**`,
+            `${lib.getFormattedCurrencyFBX(rewardValue, true)} credited, holy\nStreak: **${user.dailyStreak}**`,
         );
     }
 
