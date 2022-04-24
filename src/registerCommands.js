@@ -1,12 +1,13 @@
 /* eslint-disable no-await-in-loop */
 require('dotenv').config({ path: '../process.env' });
+// eslint-disable-next-line import/extensions
 const { Routes } = require('discord-api-types/v9');
 const { REST } = require('@discordjs/rest');
 const commandList = require('./command/index.js').mapping;
 
 const { BOT_TOKEN, APPLICATION_ID } = process.env;
 // leave this null if you want to update commands globally
-const GUILD_ID = process.argv[2] ? process.env.GUILD_ID : null;
+const GUILD_ID = process.argv[2] || null;
 
 console.log(`Updating commands for ${GUILD_ID ? 'guild' : 'global'} ${GUILD_ID || ''}`);
 
