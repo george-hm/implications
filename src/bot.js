@@ -1,6 +1,5 @@
 const { Client, Intents } = require('discord.js');
 const Interaction = require('./model/discord/Interaction.js');
-const User = require('./model/discord/User.js');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
