@@ -4,6 +4,7 @@ const InteractionResponse = require('../model/discord/InteractionResponse.js');
 const Card = require('../model/Card.js');
 const Embed = require('../model/discord/Embed.js');
 const Component = require('../model/discord/Component.js');
+const lib = require('../lib.js');
 
 const openGames = {};
 
@@ -14,14 +15,6 @@ const actionStand = 'stand';
 class Blackjack extends Command {
     async main() {
         const { customIdValue } = this;
-        if (this.user.getUserId() !== '129416238916042752' && this.user.getUserId() !== '84005689822810112' && this.user.getUserId() !== '126415597578878987') {
-            return new InteractionResponse(
-                'You are not authorized to use this command',
-                null,
-                null,
-                true,
-            );
-        }
         if (!openGames[this.user.getUserId()]) {
             return this.start();
         }
@@ -135,12 +128,13 @@ class Blackjack extends Command {
             embedToReturn.setColor('#00ff00');
             embedToReturn.setTitle('You won!');
             this.user.addCurrency(game.amount * 2);
-            returnText = `You won ${game.amount * 2} funbux`;
+            returnText = `You won ${lib.getFormattedCurrencyFBX(game.amount * 2)}`;
+            this.user.blackjackWins++;
         } else if (draw) {
             embedToReturn.setColor('#ffff00');
             embedToReturn.setTitle('Draw!');
             this.user.addCurrency(game.amount);
-            returnText = `Bet of ${game.amount} funbux returned`;
+            returnText = `Bet of ${lib.getFormattedCurrencyFBX(game.amount)} returned`;
         } else {
             embedToReturn.setColor('#ff0000');
             embedToReturn.setTitle('You lost!');
@@ -152,11 +146,21 @@ class Blackjack extends Command {
             new Component(
                 Component.TYPE_BUTTON,
                 Component.STYLE_PRIMARY,
-                `Play again (${game.amount}FNB)`,
+                `Play again (${lib.getFormattedCurrencyFBX(game.amount)})`,
                 null,
                 this.createCustomId(
                     actionHit,
                     game.amount,
+                ),
+            ),
+            new Component(
+                Component.TYPE_BUTTON,
+                Component.STYLE_PRIMARY,
+                'Show balance',
+                null,
+                Command.createIdForCommand(
+                    'balance',
+                    this.user,
                 ),
             ),
         ];
@@ -167,6 +171,7 @@ class Blackjack extends Command {
         container.setComponents(buttons);
 
         delete openGames[this.user.getUserId()];
+        this.user.save();
         return new InteractionResponse(
             returnText,
             [embedToReturn],
@@ -181,7 +186,7 @@ class Blackjack extends Command {
     }
 
     getGambleAmount() {
-        return this.options.getNumber(optionAmount) ||
+        return this.options?.getInteger(optionAmount) ||
             this._customId?.split('.')[3] ||
             null;
     }
@@ -221,7 +226,7 @@ class Blackjack extends Command {
         const textResponse = `**${this.user.getName()}**: ${playerTotal}\n${playerCardsString}\n**Dealer**: ${dealerTotal}\n${dealerCardsString}`;
 
         const embedToReturn = new Embed(
-            'Blackjack',
+            `Blackjack ${lib.getFormattedCurrencyFBX(game.amount)}`,
             textResponse,
             '#0000ff',
         );
@@ -265,7 +270,7 @@ class Blackjack extends Command {
         return new SlashCommandBuilder()
             .setName(this.commandName)
             .setDescription('Play blackjack')
-            .addStringOption(option => option.setName(optionAmount)
+            .addIntegerOption(option => option.setName(optionAmount)
                 .setDescription('How much you want to gamble')
                 .setRequired(true))
             .toJSON();
