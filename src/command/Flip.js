@@ -132,16 +132,9 @@ class Flip extends Command {
                 .setDescription('How much you want to gamble')
                 .setRequired(true))
             .addStringOption(option => option.setName(optionChoice)
-                .addChoices([
-                    {
-                        name: optionChoiceHeads,
-                        value: optionChoiceHeads,
-                    },
-                    {
-                        name: optionChoiceTails,
-                        value: optionChoiceTails,
-                    },
-                ])
+                .setDescription('Will the coin land on heads or tails?')
+                .addChoice(optionChoiceHeads, optionChoiceHeads)
+                .addChoice(optionChoiceTails, optionChoiceTails)
                 .setRequired(true))
             .toJSON();
     }
