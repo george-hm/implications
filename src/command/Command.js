@@ -43,6 +43,10 @@ class Command {
         throw new Error('Not implemented');
     }
 
+    static createIdForCommand(commandName, user) {
+        return `${commandName}.${Math.random().toString().slice(-4)}.${user.getUserId()}`;
+    }
+
     createCustomId(name) {
         return `${this.commandName}.${name || Math.random().toString().slice(-4)}.${this.user.getUserId()}`;
     }
