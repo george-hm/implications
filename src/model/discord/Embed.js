@@ -41,8 +41,7 @@ class Embed {
 
     _generateFooter() {
         return {
-            text: 'Scouter by Imp#8373',
-            icon_url: 'https://static.wikia.nocookie.net/dbz-dokkanbattle/images/c/ca/Dragon_Ball_4.png/revision/latest/scale-to-width-down/855?cb=20180708134114',
+            text: 'Imply by Imp#8373',
         };
     }
 
