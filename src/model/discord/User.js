@@ -1,6 +1,7 @@
 const fs = require('fs');
 const allUserData = require('../../users.json');
 const time = require('../../time.js');
+const lib = require('../../lib.js');
 
 // https://discord.com/developers/docs/resources/user#user-object
 class User {
@@ -17,11 +18,12 @@ class User {
         this._flags = user.flags;
         this._premiumType = user.premium_type;
         this._publicFlags = user.public_flags;
-        this._currency = 0;
+        this.currency = 0;
         this.lastDailyCheckIn = 0;
         this.lastHourlyCheckIn = 0;
         this.dailyStreak = 0;
-        this._hourlyStreak = 0;
+        this.hourlyStreak = 0;
+        this.blackjackWins = 0;
     }
 
     save() {
@@ -37,22 +39,24 @@ class User {
             return builtUser;
         }
 
-        builtUser._currency = userData.currency;
+        builtUser.currency = userData.currency;
         builtUser.lastDailyCheckIn = userData.lastDailyCheckIn;
         builtUser.lastHourlyCheckIn = userData.lastHourlyCheckIn;
         builtUser.dailyStreak = userData.dailyStreak;
-        builtUser._hourlyStreak = userData.hourlyStreak;
+        builtUser.hourlyStreak = userData.hourlyStreak;
+        builtUser.blackjackWins = userData.blackjackWins;
 
         return builtUser;
     }
 
     getUserDataObject() {
         return {
-            currency: this._currency,
+            currency: this.currency,
             lastDailyCheckIn: this.lastDailyCheckIn,
             lastHourlyCheckIn: this.lastHourlyCheckIn,
-            dailyStreak: this._dailyStreak,
-            hourlyStreak: this._hourlyStreak,
+            dailyStreak: this.dailyStreak,
+            hourlyStreak: this.hourlyStreak,
+            blackjackWins: this.blackjackWins,
         };
     }
 
@@ -72,25 +76,22 @@ class User {
             ) * currentStreak,
         );
 
-        this._currency += reward;
+        this.currency += reward;
 
         return reward;
     }
 
-    get currency() {
-        return this._currency;
-    }
-
     addCurrency(amount) {
-        this._currency += amount;
+        this.currency += amount;
         return this;
     }
 
     removeCurrency(amount) {
-        this._currency -= amount;
-        if (this._currency < 0) {
-            this._currency = 0;
+        this.currency -= amount;
+        if (this.currency < 0) {
+            this.currency = 0;
         }
+        this.save();
         return this;
     }
 
@@ -104,14 +105,14 @@ class User {
 
     grantHourlyReward() {
         const streakModifier = 33;
-        this._hourlyStreak = time.hourlyStreakIsValid(this._hourlyStreak, this._lastHourlyCheckin) ?
-            this._hourlyStreak : 0;
+        this.hourlyStreak = time.hourlyStreakIsValid(this.hourlyStreak, this._lastHourlyCheckin) ?
+            this.hourlyStreak : 0;
         const rewardValue = this._grantReward(
             User.HourlyReward,
             streakModifier,
-            this._hourlyStreak,
+            this.hourlyStreak,
         );
-        this._hourlyStreak++;
+        this.hourlyStreak++;
         return rewardValue;
     }
 
@@ -134,6 +135,10 @@ class User {
 
     getName() {
         return `${this._username}#${this._discriminator}`;
+    }
+
+    getFormattedCurrency(expand) {
+        return lib.getFormattedCurrencyFBX(this.currency, expand);
     }
 
     /**
